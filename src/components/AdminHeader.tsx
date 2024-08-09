@@ -31,11 +31,13 @@ const AdminHeader = ({
     }
 
     return (
-        <Stack display={"flex"} direction={"row"} alignItems={"center"} justifyContent={"space-between"}>
-            <Typography variant="h3" mb={2} fontWeight={700}>{heading}</Typography>
-            <IconButton onClick={handleClick}>
-                <MenuIcon />
-            </IconButton>
+        <>
+            <Stack display={"flex"} direction={"row"} mb={2} alignItems={"center"} justifyContent={"space-between"}>
+                <Typography variant="h3" fontWeight={700}>{heading}</Typography>
+                <IconButton onClick={handleClick}>
+                    <MenuIcon />
+                </IconButton>
+            </Stack>
             <Menu
                 id="basic-menu"
                 anchorEl={anchorEl}
@@ -45,11 +47,11 @@ const AdminHeader = ({
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                <MenuItem onClick={()=>navigate("products")}>Products</MenuItem>
-                <MenuItem onClick={()=>navigate("buy")}>Buy Products</MenuItem>
-                <MenuItem onClick={()=>navigate("refil")}>Refil Products</MenuItem>
+                <MenuItem onClick={() => navigate("products")}>Products</MenuItem>
+                <MenuItem onClick={() => navigate("buy")}>Buy Products</MenuItem>
+                <MenuItem onClick={() => navigate("refil")}>Refil Products</MenuItem>
             </Menu>
-        </Stack>
+        </>
     )
 }
 

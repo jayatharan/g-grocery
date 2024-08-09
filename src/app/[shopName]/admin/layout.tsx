@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import AdminPasskeyProtector from "@/components/AdminPasskeyProtector";
 
 export default async function RootLayout(props: { 

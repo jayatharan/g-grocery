@@ -67,6 +67,7 @@ model Shop {
   id         Int       @id @default(autoincrement())
   nameUnique String    @unique
   name       String
+  passKey    String    @default("p@ssword")
   products   Product[]
 }
 

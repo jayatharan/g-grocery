@@ -1,6 +1,7 @@
 import { Container, Stack, Typography } from "@mui/material";
 import prisma from "@/lib/prisma";
 import AdminProductsList from "@/components/AdminProductsList";
+import AdminHeader from "@/components/AdminHeader";
 
 interface Props {
     params: {
@@ -40,7 +41,7 @@ export default async function AdminProductsScreen({
 
     return (
         <Container maxWidth={"md"}>
-            <Typography variant="h3" fontWeight={700}>Products</Typography>
+            <AdminHeader heading="Products" shopName={shopName} />
             <AdminProductsList products={products} shop={shop} />
         </Container>
     )

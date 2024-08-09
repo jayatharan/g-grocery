@@ -1,6 +1,7 @@
 import AdminProductsListToRefil from "@/components/AdminProductsListToRefil";
 import { Container, Typography } from "@mui/material";
 import prisma from "@/lib/prisma";
+import AdminHeader from "@/components/AdminHeader";
 
 interface Props {
     params: {
@@ -33,7 +34,7 @@ export default async function AdminRefilProductsScreen({
 
     return (
         <Container maxWidth={"md"}>
-            <Typography variant="h3" fontWeight={700}>Refil Products</Typography>
+            <AdminHeader heading="Refil Products" shopName={shopName} />
             <AdminProductsListToRefil products={products} />
         </Container>
     )

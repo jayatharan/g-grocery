@@ -1,5 +1,6 @@
 import AdminProductsListToRefil from "@/components/AdminProductsListToRefil";
 import { Container, Typography } from "@mui/material";
+import prisma from "@/lib/prisma";
 
 interface Props {
     params: {

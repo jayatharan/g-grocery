@@ -6,7 +6,7 @@ import saveProduct from '@/actions/saveProduct';
 interface Props {
     shopId: number,
     product?: ProductWithPrice,
-    onSave:  (savedProduct: ProductWithPrice) => void;
+    onSave: (savedProduct: ProductWithPrice) => void;
 }
 
 const defaultValue = {
@@ -23,9 +23,9 @@ const AdminProductForm = ({
 }: Props) => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(defaultValue)
-    
+
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = event.target;
+        const { name, value } = event.target;
 
         setFormData(prev => ({
             ...prev,
@@ -34,42 +34,42 @@ const AdminProductForm = ({
     }
 
     const saveShopProduct = async () => {
-        if(!formData.name) return;
+        if (!formData.name) return;
         setLoading(true)
-        try{
+        try {
             const productFormData = new FormData()
             productFormData.set("shopId", shopId.toString())
             productFormData.set("name", formData.name)
-            productFormData.set("category",formData.category)
+            productFormData.set("category", formData.category)
             productFormData.set("price", formData.price.toString())
             productFormData.set("description", formData.description)
-            
-            if(product){
+
+            if (product) {
                 productFormData.set("id", product.id.toString())
             }
 
             const savedProduct = await saveProduct(productFormData)
             onSave(savedProduct)
-        }catch(error){
+        } catch (error) {
             console.log(error)
         }
         setLoading(false)
     }
 
     const initializeForm = () => {
-        if(product){
+        if (product) {
             setFormData({
                 name: product.name,
                 category: product.category,
-                description: product.description??"",
-                price: product.prices[0]?.price??0
+                description: product.description ?? "",
+                price: product.prices[0]?.price ?? 0
             })
-        }else{
+        } else {
             setFormData(defaultValue)
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         initializeForm()
     }, [product])
 
@@ -90,10 +90,12 @@ const AdminProductForm = ({
                         name="name"
                     />
                 </Stack>
-                <Stack display={{
-                    xs: "none",
-                    sm: "flex"
-                }} flex={1} >
+            </Stack>
+            <Stack
+                display={"flex"}
+                direction={"row"}
+            >
+                <Stack display={"flex"} flex={3} >
                     <TextField
                         size='small'
                         value={formData.category}
@@ -102,10 +104,7 @@ const AdminProductForm = ({
                         name="category"
                     />
                 </Stack>
-                <Stack display={{
-                    xs: "none",
-                    sm: "flex"
-                }} flex={1} >
+                <Stack display={"flex"} flex={2} >
                     <TextField
                         size='small'
                         type='number'

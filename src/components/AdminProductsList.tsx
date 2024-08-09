@@ -46,6 +46,10 @@ function AdminProductsList({
 
     return (
         <Stack spacing={2}>
+            <Stack py={1}>
+                <Typography variant='h6'>Add New Product</Typography>
+                <AdminProductForm shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} />
+            </Stack>
             <Stack display={'flex'} direction={'row'} justifyContent={'flex-end'}>
                 <TextField
                     size='small'
@@ -81,9 +85,6 @@ function AdminProductsList({
                             Price
                         </Typography>
                     </Stack>
-                </Stack>
-                <Stack py={1}>
-                    <AdminProductForm shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} />
                 </Stack>
                 {filteredProducts.map(product => (
                     <AdminProductItem key={product.id} product={product} onSave={handleSaveProduct} />

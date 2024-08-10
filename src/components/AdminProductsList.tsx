@@ -71,7 +71,7 @@ function AdminProductsList({
                     <Switch size='medium' checked={addNew} onClick={() => setAddNew(prev => !prev)} />
                 </Stack>
                 {addNew && (
-                    <AdminProductForm addNew={addNew} shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} />
+                    <AdminProductForm addNew={addNew} shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} products={productList} />
                 )}
             </Stack>
             <Stack>

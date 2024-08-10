@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField } from '@mui/material'
+import { Autocomplete, Button, Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField } from '@mui/material'
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { ProductWithPrice } from './AdminProductsList'
 import saveProduct from '@/actions/saveProduct';
@@ -9,6 +9,7 @@ interface Props {
     product?: ProductWithPrice,
     onSave: (savedProduct: ProductWithPrice) => void;
     addNew?: boolean;
+    products?: ProductWithPrice[]
 }
 
 const defaultValue = {
@@ -22,7 +23,8 @@ const AdminProductForm = ({
     shopId,
     product,
     onSave,
-    addNew
+    addNew,
+    products
 }: Props) => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(defaultValue)
@@ -100,22 +102,64 @@ const AdminProductForm = ({
                 direction={"row"}
             >
                 <Stack display={"flex"} flex={2} >
-                    <TextField
-                        size='small'
-                        value={formData.name}
-                        placeholder='Name'
-                        onChange={handleChange}
-                        name="name"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position='end'>
-                                    <IconButton size='small' onClick={clearName}>
-                                        <ArrowBackIcon />
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    />
+                    {products?(
+                        <Autocomplete
+                            size='small'
+                            options={products.map(product => product.name)}
+                            value={formData.name}
+                            onChange={(_, name) => {
+                                if(name){
+                                    const product = products.find(p => p.name == name)
+                                    if(product){
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            name,
+                                            category: product.category,
+                                            description: product.description??"",
+                                        }))
+                                    }
+                                }
+                            }}
+                            onInputChange={(_, name) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    name: name? name : prev.name
+                                }))
+                            }}
+                            renderInput={(params) => <TextField 
+                                {...params}
+                                placeholder='Name'
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <InputAdornment position='end'>
+                                            <IconButton size='small' onClick={clearName}>
+                                                <ArrowBackIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )                              
+                                }}
+                            />} 
+                            freeSolo
+                        />
+                    ) : (
+                        <TextField
+                            size='small'
+                            value={formData.name}
+                            placeholder='Name'
+                            onChange={handleChange}
+                            name="name"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position='end'>
+                                        <IconButton size='small' onClick={clearName}>
+                                            <ArrowBackIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    )}
                 </Stack>
             </Stack>
             <Stack

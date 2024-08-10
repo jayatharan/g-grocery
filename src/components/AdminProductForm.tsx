@@ -2,8 +2,8 @@ import { Button, Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, 
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { ProductWithPrice } from './AdminProductsList'
 import saveProduct from '@/actions/saveProduct';
-import CloseIcon from '@mui/icons-material/Close';
-import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 interface Props {
     shopId: number,
     product?: ProductWithPrice,
@@ -83,15 +83,10 @@ const AdminProductForm = ({
     const clearName = () => {
         setFormData(prev => {
             const nameSplit = prev.name.split(' ')
-            let name = ""
-            nameSplit.forEach((val, idx) => {
-                if (idx + 1 !== nameSplit.length) {
-                    name = [name, val].join(' ').trim()
-                }
-            })
+            nameSplit.pop()
             return {
                 ...prev,
-                name
+                name: nameSplit.join(' ').trim()
             }
         })
     }
@@ -115,7 +110,7 @@ const AdminProductForm = ({
                             endAdornment: (
                                 <InputAdornment position='end'>
                                     <IconButton size='small' onClick={clearName}>
-                                        <ArrowLeftIcon />
+                                        <ArrowBackIcon />
                                     </IconButton>
                                 </InputAdornment>
                             )

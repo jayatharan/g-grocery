@@ -1,6 +1,6 @@
 "use client"
 
-import { Checkbox, FormControlLabel, Stack, TextField, Typography } from "@mui/material"
+import { FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material"
 import { Buy, Product } from "@prisma/client"
 import { useMemo, useState } from "react"
 import AdminProductBuyItem from "./AdminProductBuyItem"
@@ -18,7 +18,7 @@ const AdminProductsListToBuy = ({
 }: Props) => {
     const [productList, setProductList] = useState<ProductWithBuy[]>(products);
     const [search, setSearch] = useState("")
-    const [toRefilOnly, setToRefilOnly] = useState(false)
+    const [toBuyOnly, setToBuyOnly] = useState(false)
 
     const filteredProducts = useMemo(() => {
         return productList.filter(product => {
@@ -28,7 +28,7 @@ const AdminProductsListToBuy = ({
             const categoryMatches = product.category.toLowerCase().includes(searchLower);
             return nameMatches || descriptionMatches || categoryMatches;
         }).filter(product => {
-            if(toRefilOnly){
+            if(toBuyOnly){
                 return product.buys.length
             }
             return true;
@@ -36,7 +36,7 @@ const AdminProductsListToBuy = ({
             ...product,
             quantity: product.buys.reduce((qty, refil) => qty+refil.quantity, 0)
         })));
-    }, [productList, search, toRefilOnly]);
+    }, [productList, search, toBuyOnly]);
 
     const handleSave = (savedProduct: ProductWithBuy) => {
         setProductList(prev => prev.map(product => {
@@ -56,7 +56,7 @@ const AdminProductsListToBuy = ({
                     fullWidth
                 />
                 <Stack display={"flex"} direction={"row"} justifyContent={"flex-end"}>
-                    <FormControlLabel control={<Checkbox value={toRefilOnly} onClick={() => setToRefilOnly(prev => !prev)} />} label="Refil Only" />
+                    <FormControlLabel control={<Switch checked={toBuyOnly} onClick={() => setToBuyOnly(prev => !prev)} />} label="Buy Only" />
                 </Stack>
                 <Stack spacing={1}>
                     <Stack

@@ -11,11 +11,13 @@ const AdminProductItemView = ({
 }: Props) => {
   return (
     <Stack key={product.id} sx={{
-        borderBottom: "2px solid grey"
+        borderBottom: "2px solid grey",
+        minHeight: "45px"
     }} >
         <Stack
             display={"flex"}
             direction={"row"}
+            alignItems={"start"}
         >
             <Stack display={"flex"} flex={2} >
                 <Typography variant='body1' fontWeight={700}>
@@ -26,7 +28,7 @@ const AdminProductItemView = ({
                 xs: "none",
                 sm: "flex"
             }} flex={1} >
-                <Typography variant='body1' fontWeight={700}>
+                <Typography variant='body1' fontWeight={700} noWrap>
                     {product.category}
                 </Typography>
             </Stack>

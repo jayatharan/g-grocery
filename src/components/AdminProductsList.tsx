@@ -1,5 +1,5 @@
 "use client"
-import { Stack, TextField, Typography } from '@mui/material'
+import { FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
 import { Price, Product, Shop } from '@prisma/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import AdminProductItem from './AdminProductItem'
@@ -20,6 +20,8 @@ function AdminProductsList({
 }: Props) {
     const [productList, setProductList] = useState<ProductWithPrice[]>(products);
     const [search, setSearch] = useState("")
+    const [addNew, setAddNew] = useState(false)
+    const [zeroPriceOnly, setZeroPriceOnly] = useState(false)
 
     const filteredProducts = useMemo(() => {
         return productList.filter(product => {
@@ -28,8 +30,15 @@ function AdminProductsList({
             const descriptionMatches = product.description?.toLowerCase().includes(searchLower) || false;
             const categoryMatches = product.category.toLowerCase().includes(searchLower);
             return nameMatches || descriptionMatches || categoryMatches;
+        }).filter(product => {
+            if(zeroPriceOnly){
+                if(product.prices.length == 0) return true;
+                else if(product.prices[0].price <= 0) return true;
+                else return false
+            }
+            return true
         });
-    }, [productList, search]);
+    }, [productList, search, zeroPriceOnly]);
 
     const handleSaveProduct = (savedProduct:ProductWithPrice, isNew?: boolean)=> {
         if(isNew){
@@ -47,10 +56,15 @@ function AdminProductsList({
     return (
         <Stack spacing={2}>
             <Stack py={1}>
-                <Typography variant='h6' fontWeight={700}>Add New Product</Typography>
-                <AdminProductForm shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} />
+                <Stack display={'flex'} direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
+                    <Typography variant='h6' fontWeight={700}>Add New Product</Typography>
+                    <Switch size='medium' checked={addNew} onClick={()=>setAddNew(prev => !prev)} />
+                </Stack>
+                {addNew && (
+                    <AdminProductForm addNew={addNew} shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} />
+                )}
             </Stack>
-            <Stack display={'flex'} direction={'row'} justifyContent={'flex-end'}>
+            <Stack>
                 <TextField
                     size='small'
                     value={search}
@@ -58,6 +72,9 @@ function AdminProductsList({
                     placeholder='Search...'
                     fullWidth
                 />
+                <Stack display={"flex"} direction={"row"} justifyContent={"flex-end"}>
+                    <FormControlLabel control={<Switch checked={zeroPriceOnly} onClick={() => setZeroPriceOnly(prev => !prev)} />} label="Zero Price Only" />
+                </Stack>
             </Stack>
             <Stack spacing={1}>
                 <Stack
@@ -81,8 +98,8 @@ function AdminProductsList({
                         </Typography>
                     </Stack>
                     <Stack display={"flex"} flex={1}>
-                        <Typography variant='h6' fontWeight={700}>
-                            Price
+                        <Typography textAlign={'right'} variant='h6' fontWeight={700}>
+                            Price (EUR)
                         </Typography>
                     </Stack>
                 </Stack>

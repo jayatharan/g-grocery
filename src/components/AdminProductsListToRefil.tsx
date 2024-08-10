@@ -1,6 +1,6 @@
 "use client"
 
-import { Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material"
+import { Switch , FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material"
 import { Price, Product, Refil } from "@prisma/client"
 import { useMemo, useState } from "react"
 import UpgradeIcon from '@mui/icons-material/Upgrade';
@@ -58,7 +58,7 @@ const AdminProductsListToRefil = ({
                     fullWidth
                 />
                 <Stack display={"flex"} direction={"row"} justifyContent={"flex-end"}>
-                    <FormControlLabel control={<Checkbox value={toRefilOnly} onClick={() => setToRefilOnly(prev => !prev)} />} label="Refil Only" />
+                    <FormControlLabel control={<Switch checked={toRefilOnly} onClick={() => setToRefilOnly(prev => !prev)} />} label="Refil Only" />
                 </Stack>
                 <Stack spacing={1}>
                     <Stack

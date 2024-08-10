@@ -79,7 +79,10 @@ const AdminProductBuyItem = ({
     }, [product])
 
     return (
-        <Stack key={product.id} >
+        <Stack key={product.id} pb={1} sx={{
+            borderBottom: "2px solid grey",
+            minHeight: "45px"
+        }}>
             <Stack
                 display={"flex"}
                 direction={"row"}

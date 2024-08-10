@@ -1,12 +1,14 @@
-import { Button, Stack, TextField } from '@mui/material'
+import { Button, Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField } from '@mui/material'
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { ProductWithPrice } from './AdminProductsList'
 import saveProduct from '@/actions/saveProduct';
-
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
 interface Props {
     shopId: number,
     product?: ProductWithPrice,
     onSave: (savedProduct: ProductWithPrice) => void;
+    addNew?: boolean;
 }
 
 const defaultValue = {
@@ -19,10 +21,12 @@ const defaultValue = {
 const AdminProductForm = ({
     shopId,
     product,
-    onSave
+    onSave,
+    addNew
 }: Props) => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(defaultValue)
+    const [reset, setReset] = useState(false);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
@@ -49,6 +53,9 @@ const AdminProductForm = ({
             }
 
             const savedProduct = await saveProduct(productFormData)
+
+            if (reset) setFormData(defaultValue)
+
             onSave(savedProduct)
         } catch (error) {
             console.log(error)
@@ -73,6 +80,22 @@ const AdminProductForm = ({
         initializeForm()
     }, [product])
 
+    const clearName = () => {
+        setFormData(prev => {
+            const nameSplit = prev.name.split(' ')
+            let name = ""
+            nameSplit.forEach((val, idx) => {
+                if (idx + 1 !== nameSplit.length) {
+                    name = [name, val].join(' ').trim()
+                }
+            })
+            return {
+                ...prev,
+                name
+            }
+        })
+    }
+
     return (
         <Stack sx={{
             borderBottom: "2px solid grey"
@@ -88,6 +111,15 @@ const AdminProductForm = ({
                         placeholder='Name'
                         onChange={handleChange}
                         name="name"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position='end'>
+                                    <IconButton size='small' onClick={clearName}>
+                                        <ArrowLeftIcon />
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
                     />
                 </Stack>
             </Stack>
@@ -129,6 +161,9 @@ const AdminProductForm = ({
                 />
                 <Button variant='contained' disabled={loading} onClick={saveShopProduct}>Save</Button>
             </Stack>
+            {addNew && (
+                <FormControlLabel control={<Checkbox checked={reset} onClick={() => setReset(true)} />} label="Reset on Save" />
+            )}
         </Stack>
     )
 }

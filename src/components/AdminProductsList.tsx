@@ -1,9 +1,10 @@
 "use client"
-import { FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
+import { FormControlLabel, IconButton, InputAdornment, Stack, Switch, TextField, Typography } from '@mui/material'
 import { Price, Product, Shop } from '@prisma/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import AdminProductItem from './AdminProductItem'
 import AdminProductForm from './AdminProductForm'
+import ClearIcon from '@mui/icons-material/Clear';
 
 export interface ProductWithPrice extends Product {
     prices: Price[]
@@ -13,6 +14,13 @@ interface Props {
     products: ProductWithPrice[],
     shop: Shop,
 }
+
+export const calculateMatchPercentage = (searchLower: string, text: string) => {
+    if (!text) return 0;
+    const words = searchLower.split(" ");
+    const matches = words.filter(word => text.includes(word)).length;
+    return (matches / words.length) * 100;
+};
 
 function AdminProductsList({
     products,
@@ -25,28 +33,30 @@ function AdminProductsList({
 
     const filteredProducts = useMemo(() => {
         return productList.filter(product => {
-            const searchLower = search.toLowerCase();
-            const nameMatches = product.name.toLowerCase().includes(searchLower);
-            const descriptionMatches = product.description?.toLowerCase().includes(searchLower) || false;
-            const categoryMatches = product.category.toLowerCase().includes(searchLower);
-            return nameMatches || descriptionMatches || categoryMatches;
-        }).filter(product => {
-            if(zeroPriceOnly){
-                if(product.prices.length == 0) return true;
-                else if(product.prices[0].price <= 0) return true;
+            if (zeroPriceOnly) {
+                if (product.prices.length == 0) return true;
+                else if (product.prices[0].price <= 0) return true;
                 else return false
             }
             return true
-        });
+        }).map(product => {
+            const searchLower = search.trim().toLowerCase();
+            const text = [product.name, product.description ?? "", product.category??""].join().toLowerCase()
+            const matchedPercentage = calculateMatchPercentage(searchLower, text);
+            return {
+                ...product,
+                matchedPercentage
+            };
+        }).filter(product => product.matchedPercentage > 0).sort((a, b) => b.matchedPercentage - a.matchedPercentage);
     }, [productList, search, zeroPriceOnly]);
 
-    const handleSaveProduct = (savedProduct:ProductWithPrice, isNew?: boolean)=> {
-        if(isNew){
+    const handleSaveProduct = (savedProduct: ProductWithPrice, isNew?: boolean) => {
+        if (isNew) {
             setProductList(prev => [savedProduct, ...prev])
-        }else{
+        } else {
             setProductList(prev => {
                 return prev.map(product => {
-                    if(savedProduct.id === product.id) return savedProduct;
+                    if (savedProduct.id === product.id) return savedProduct;
                     return product;
                 })
             })
@@ -58,7 +68,7 @@ function AdminProductsList({
             <Stack py={1}>
                 <Stack display={'flex'} direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
                     <Typography variant='h6' fontWeight={700}>Add New Product</Typography>
-                    <Switch size='medium' checked={addNew} onClick={()=>setAddNew(prev => !prev)} />
+                    <Switch size='medium' checked={addNew} onClick={() => setAddNew(prev => !prev)} />
                 </Stack>
                 {addNew && (
                     <AdminProductForm addNew={addNew} shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} />
@@ -69,6 +79,15 @@ function AdminProductsList({
                     size='small'
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
+                    InputProps={{
+                        endAdornment: search ? (
+                            <InputAdornment position='end'>
+                                <IconButton size='small' onClick={() => setSearch("")}>
+                                    <ClearIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ) : undefined
+                    }}
                     placeholder='Search...'
                     fullWidth
                 />

@@ -1,11 +1,11 @@
 "use client"
 
-import { Switch , FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material"
-import { Price, Product, Refil } from "@prisma/client"
+import { Switch , FormControl, FormControlLabel, IconButton, Stack, TextField, Typography, InputAdornment } from "@mui/material"
+import { Product, Refil } from "@prisma/client"
 import { useMemo, useState } from "react"
-import UpgradeIcon from '@mui/icons-material/Upgrade';
-import DoneIcon from '@mui/icons-material/Done';
 import AdminProductRefilItem from "./AdminProductRefilItem";
+import ClearIcon from '@mui/icons-material/Clear';
+import { calculateMatchPercentage } from "./AdminProductsList";
 
 export interface ProductWithRefil extends Product {
     refils: Refil[],
@@ -24,17 +24,19 @@ const AdminProductsListToRefil = ({
 
     const filteredProducts = useMemo(() => {
         return productList.filter(product => {
-            const searchLower = search.toLowerCase();
-            const nameMatches = product.name.toLowerCase().includes(searchLower);
-            const descriptionMatches = product.description?.toLowerCase().includes(searchLower) || false;
-            const categoryMatches = product.category.toLowerCase().includes(searchLower);
-            return nameMatches || descriptionMatches || categoryMatches;
-        }).filter(product => {
             if(toRefilOnly){
                 return product.refils.length
             }
             return true;
-        }).map((product => ({
+        }).map(product => {
+            const searchLower = search.trim().toLowerCase();
+            const text = [product.name, product.description ?? "", product.category??""].join().toLowerCase()
+            const matchedPercentage = calculateMatchPercentage(searchLower, text);
+            return {
+                ...product,
+                matchedPercentage
+            };
+        }).filter(product => product.matchedPercentage > 0).sort((a, b) => b.matchedPercentage - a.matchedPercentage).map((product => ({
             ...product,
             quantity: product.refils.reduce((qty, refil) => qty+refil.quantity, 0)
         })));
@@ -50,10 +52,19 @@ const AdminProductsListToRefil = ({
     return (
         <Stack spacing={2}>
             <Stack>
-                <TextField
+            <TextField
                     size='small'
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
+                    InputProps={{
+                        endAdornment: search ? (
+                            <InputAdornment position='end'>
+                                <IconButton size='small' onClick={()=>setSearch("")}>
+                                    <ClearIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ) : undefined
+                    }}
                     placeholder='Search...'
                     fullWidth
                 />

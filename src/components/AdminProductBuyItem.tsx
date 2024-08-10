@@ -104,6 +104,7 @@ const AdminProductBuyItem = ({
                     {actionButton}
                 </Stack>
             </Stack>
+            <Typography variant='caption'>{product.description}</Typography>
         </Stack>
     )
 }

@@ -103,6 +103,7 @@ const AdminProductRefilItem = ({
                     {actionButton}
                 </Stack>
             </Stack>
+            <Typography variant='caption'>{product.description}</Typography>
         </Stack>
     )
 }

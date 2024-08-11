@@ -6,8 +6,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import updateProductRefilQuantity from "@/actions/updateProductRefilQuantity";
 import doneProductRefil from "@/actions/doneProductRefil";
 import { motion } from "framer-motion"
-import DeleteIcon from "@mui/icons-material/Delete";
-import { LocalShipping } from "@mui/icons-material";
 import deleteProductRefil from "@/actions/deleteProductRefil";
 import notAvailableProductRefil from "@/actions/notAvailableProductRefil";
 import RotateLeftIcon from '@mui/icons-material/RotateLeft';
@@ -54,14 +52,37 @@ const AdminProductRefilItem = ({
 
     const doneRefil = useCallback(async () => {
         setLoading(true)
+        let productCopy = {...product}
+        onSave({
+            ...product,
+            refils: [],
+        })
         try {
             const formData = new FormData()
             formData.set("id", product.id.toString())
-
-            const savedProduct = await doneProductRefil(formData)
-            onSave(savedProduct)
+            await doneProductRefil(formData)
         } catch (error) {
-            console.log(error)
+            onSave(productCopy)
+        }
+        setLoading(false)
+    }, [product])
+
+    const notAvailableInStore = useCallback(async () => {
+        setLoading(true)
+        let productCopy = {...product}
+        onSave({
+            ...product,
+            refils: product.refils.map(refil => ({
+                ...refil,
+                notAvailable: true,
+            }))
+        })
+        try {
+            const formData = new FormData()
+            formData.set("id", product.id.toString())
+            await notAvailableProductRefil(formData) 
+        } catch (error) {
+            onSave(productCopy)
         }
         setLoading(false)
     }, [product])
@@ -89,14 +110,14 @@ const AdminProductRefilItem = ({
             )
         } else if (product.quantity !== 0) {
             return (
-                <IconButton disabled={loading} size="small" onClick={doneRefil}>
-                    <DoneIcon />
+                <IconButton disabled={loading} size="small" onClick={notAvailableInStore}>
+                    <ProductionQuantityLimitsIcon />
                 </IconButton>
             )
         }
 
         return null;
-    }, [product, quantity, updateRefil, loading, doneRefil])
+    }, [product, quantity, updateRefil, loading, notAvailableInStore])
 
     const content = useMemo(() => {
         if (action) {
@@ -137,6 +158,11 @@ const AdminProductRefilItem = ({
                         <TextField
                             value={quantity}
                             onChange={(event) => setQuantity(event.target.value)}
+                            onKeyDown={(event) => {
+                                if(event.key == "Enter"){
+                                    updateRefil()
+                                }
+                            }}
                             size="small"
                             type="number"
                             fullWidth
@@ -173,8 +199,8 @@ const AdminProductRefilItem = ({
                     <Typography variant="body1" color={"error"} fontWeight={700}>Reset to 0</Typography>
                 </Stack>
                 <Stack display={"flex"} direction={"row"} alignItems={"center"}>
-                    <Typography variant="body1" color={"error"} fontWeight={700}>Not Available</Typography>
-                    <ProductionQuantityLimitsIcon color={"error"} />
+                    <Typography variant="body1" color={"primary"} fontWeight={700}>Done</Typography>
+                    <DoneIcon color={"primary"} />
                 </Stack>
             </Stack>
             <motion.div
@@ -193,14 +219,16 @@ const AdminProductRefilItem = ({
                         if (movedPercent < 0.2) {
                             setAction("")
                         } else {
-                            const currentAction = x > positionRect.x ? "delete" : "not-available"
-                            setAction(currentAction)
+                            const currentAction = x > positionRect.x ? "done" : "not-available"
+                            if(currentAction){
+                                doneRefil()
+                            }else{
+                                setAction(currentAction)
+                            }
                         }
                     }
                     info.point.x = 0;
                 }}
-                // onDrag={() => {
-                // }}
                 animate={{ x: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 style={{

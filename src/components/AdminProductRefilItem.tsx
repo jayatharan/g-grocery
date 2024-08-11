@@ -10,6 +10,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { LocalShipping } from "@mui/icons-material";
 import deleteProductRefil from "@/actions/deleteProductRefil";
 import notAvailableProductRefil from "@/actions/notAvailableProductRefil";
+import RotateLeftIcon from '@mui/icons-material/RotateLeft';
+import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 
 export interface ProductWithRefilAndQuantity extends ProductWithRefil {
     quantity: number;
@@ -167,16 +169,12 @@ const AdminProductRefilItem = ({
                 zIndex: 0
             }}>
                 <Stack display={"flex"} direction={"row"} alignItems={"center"}>
-                    <Icon color="warning">
-                        <LocalShipping color={"warning"} />
-                    </Icon>
-                    <Typography variant="body1" color={"error"} fontWeight={700}>Not Available</Typography>
+                    <RotateLeftIcon color="error" />
+                    <Typography variant="body1" color={"error"} fontWeight={700}>Reset to 0</Typography>
                 </Stack>
                 <Stack display={"flex"} direction={"row"} alignItems={"center"}>
-                    <Typography variant="body1" color={"error"} fontWeight={700}>Reset to 0</Typography>
-                    <Icon color="error">
-                        <DeleteIcon />
-                    </Icon>
+                    <Typography variant="body1" color={"error"} fontWeight={700}>Not Available</Typography>
+                    <ProductionQuantityLimitsIcon color={"error"} />
                 </Stack>
             </Stack>
             <motion.div
@@ -192,10 +190,10 @@ const AdminProductRefilItem = ({
                             width
                         } = rect
                         const movedPercent = (Math.abs(positionRect.x - x) / width)
-                        if (movedPercent < 0.1) {
+                        if (movedPercent < 0.2) {
                             setAction("")
                         } else {
-                            const currentAction = x > positionRect.x ? "not-available" : "delete"
+                            const currentAction = x > positionRect.x ? "delete" : "not-available"
                             setAction(currentAction)
                         }
                     }

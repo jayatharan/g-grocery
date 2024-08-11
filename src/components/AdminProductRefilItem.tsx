@@ -102,6 +102,13 @@ const AdminProductRefilItem = ({
 
     const actionRefil = useCallback(async () => {
         setLoading(true)
+        const productCopy = {...product}
+        if(action == "delete"){
+            onSave({
+                ...product,
+                refils: []
+            })
+        }
         try {
             const formData = new FormData()
             formData.set("id", product.id.toString())
@@ -109,6 +116,7 @@ const AdminProductRefilItem = ({
             setAction("")
             onSave(savedProduct)
         } catch (error) {
+            onSave(productCopy)
             console.log(error)
         }
         setLoading(false)

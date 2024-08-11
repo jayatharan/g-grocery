@@ -37,6 +37,19 @@ const AdminProductRefilItem = ({
             qty = parseInt(quantity) - product.quantity
         }
         setLoading(true)
+        const productCopy = {...product}
+        onSave({
+            ...product,
+            refils: [...product.refils, {
+                id: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                done: false,
+                notAvailable: false,
+                productId: product.id,
+                quantity: qty,
+            }]
+        })
         try {
             const formData = new FormData()
             formData.set("id", product.id.toString())
@@ -45,14 +58,14 @@ const AdminProductRefilItem = ({
             const savedProduct = await updateProductRefilQuantity(formData)
             onSave(savedProduct)
         } catch (error) {
-            console.log(error)
+            onSave(productCopy)
         }
         setLoading(false)
     }, [quantity, product])
 
     const doneRefil = useCallback(async () => {
         setLoading(true)
-        let productCopy = {...product}
+        const productCopy = {...product}
         onSave({
             ...product,
             refils: [],
@@ -69,7 +82,7 @@ const AdminProductRefilItem = ({
 
     const notAvailableInStore = useCallback(async () => {
         setLoading(true)
-        let productCopy = {...product}
+        const productCopy = {...product}
         onSave({
             ...product,
             refils: product.refils.map(refil => ({

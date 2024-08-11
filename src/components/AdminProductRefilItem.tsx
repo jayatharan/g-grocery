@@ -19,11 +19,13 @@ export interface ProductWithRefilAndQuantity extends ProductWithRefil {
 interface Props {
     product: ProductWithRefilAndQuantity
     onSave: (savedProduct: ProductWithRefil) => void;
+    focusSearch: (clear: boolean) => void;
 }
 
 const AdminProductRefilItem = ({
     product,
-    onSave
+    onSave,
+    focusSearch
 }: Props) => {
     const positionRef = useRef<HTMLDivElement>(null);
     const constainerRef = useRef<HTMLDivElement>(null);
@@ -60,6 +62,7 @@ const AdminProductRefilItem = ({
         } catch (error) {
             onSave(productCopy)
         }
+        focusSearch(true)
         setLoading(false)
     }, [quantity, product])
 
@@ -240,7 +243,7 @@ const AdminProductRefilItem = ({
                             width
                         } = rect
                         const movedPercent = (Math.abs(positionRect.x - x) / width)
-                        if (movedPercent < 0.2) {
+                        if (movedPercent < 0.1) {
                             setAction("")
                         } else {
                             const currentAction = x > positionRect.x ? "delete" : "done"

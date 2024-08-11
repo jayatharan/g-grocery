@@ -109,14 +109,17 @@ const AdminProductRefilItem = ({
                 refils: []
             })
         }
+        const currentAction = action;
+        setAction("")
         try {
             const formData = new FormData()
             formData.set("id", product.id.toString())
-            const savedProduct = action == "not-available" ? await notAvailableProductRefil(formData) : await deleteProductRefil(formData)
+            const savedProduct = currentAction == "not-available" ? await notAvailableProductRefil(formData) : await deleteProductRefil(formData)
             setAction("")
             onSave(savedProduct)
         } catch (error) {
             onSave(productCopy)
+            setAction(currentAction)
             console.log(error)
         }
         setLoading(false)

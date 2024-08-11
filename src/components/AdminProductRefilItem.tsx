@@ -232,8 +232,8 @@ const AdminProductRefilItem = ({
                         if (movedPercent < 0.2) {
                             setAction("")
                         } else {
-                            const currentAction = x > positionRect.x ? "done" : "not-available"
-                            if(currentAction){
+                            const currentAction = x > positionRect.x ? "delete" : "done"
+                            if(currentAction == "done"){
                                 doneRefil()
                             }else{
                                 setAction(currentAction)

@@ -139,8 +139,10 @@ const AdminProductForm = ({
                                         </InputAdornment>
                                     )                              
                                 }}
+                                fullWidth
                             />} 
                             freeSolo
+                            fullWidth
                         />
                     ) : (
                         <TextField

@@ -1,6 +1,6 @@
 "use client"
 
-import { Switch , FormControl, FormControlLabel, IconButton, Stack, TextField, Typography, InputAdornment } from "@mui/material"
+import { Switch , FormControlLabel, IconButton, Stack, TextField, Typography, InputAdornment } from "@mui/material"
 import { Product, Refil } from "@prisma/client"
 import { useMemo, useState } from "react"
 import AdminProductRefilItem from "./AdminProductRefilItem";
@@ -21,6 +21,7 @@ const AdminProductsListToRefil = ({
     const [productList, setProductList] = useState<ProductWithRefil[]>(products);
     const [search, setSearch] = useState("")
     const [toRefilOnly, setToRefilOnly] = useState(false)
+    const [hideNotAvailable, setHideNotAvailable] = useState(false);
 
     const filteredProducts = useMemo(() => {
         return productList.filter(product => {
@@ -38,9 +39,15 @@ const AdminProductsListToRefil = ({
             };
         }).filter(product => product.matchedPercentage > 0).sort((a, b) => b.matchedPercentage - a.matchedPercentage).map((product => ({
             ...product,
-            quantity: product.refils.reduce((qty, refil) => qty+refil.quantity, 0)
-        })));
-    }, [productList, search, toRefilOnly]);
+            quantity: product.refils.reduce((qty, refil) => qty+refil.quantity, 0),
+            isNotAvailable: product.refils.find((refil) => refil.notAvailable) ? true : false
+        }))).filter(product => {
+            if(hideNotAvailable){
+                return !product.isNotAvailable
+            }
+            return true
+        });
+    }, [productList, search, toRefilOnly, hideNotAvailable]);
 
     const handleSave = (savedProduct: ProductWithRefil) => {
         setProductList(prev => prev.map(product => {
@@ -69,6 +76,7 @@ const AdminProductsListToRefil = ({
                     fullWidth
                 />
                 <Stack display={"flex"} direction={"row"} justifyContent={"flex-end"}>
+                    <FormControlLabel control={<Switch checked={hideNotAvailable} onClick={() => setHideNotAvailable(prev => !prev)} />} label="Hide Not Available" />
                     <FormControlLabel control={<Switch checked={toRefilOnly} onClick={() => setToRefilOnly(prev => !prev)} />} label="Refil Only" />
                 </Stack>
                 <Stack spacing={1}>

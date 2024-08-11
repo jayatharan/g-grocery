@@ -95,6 +95,7 @@ model Refil {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 
+  notAvailable Boolean @default(false)
   done    Boolean @default(false)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

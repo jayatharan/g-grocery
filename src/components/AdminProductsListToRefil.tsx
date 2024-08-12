@@ -61,9 +61,7 @@ const AdminProductsListToRefil = ({
         if (clear) {
             setSearch("")
         }
-        searchBoxRef.current?.click()
         searchBoxRef.current?.focus()
-        searchBoxRef.current?.click()
     }
 
     return (
@@ -86,7 +84,6 @@ const AdminProductsListToRefil = ({
                     placeholder='Search...'
                     fullWidth
                 />
-                <Typography onClick={()=>focusSearch(true)}>Test</Typography>
                 <Stack display={"flex"} direction={"row"} justifyContent={"flex-end"}>
                     <FormControlLabel control={<Switch checked={hideNotAvailable} onClick={() => setHideNotAvailable(prev => !prev)} />} label="Hide Not Available" />
                     <FormControlLabel control={<Switch checked={toRefilOnly} onClick={() => setToRefilOnly(prev => !prev)} />} label="Refil Only" />

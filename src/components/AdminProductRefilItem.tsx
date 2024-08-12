@@ -33,7 +33,7 @@ const AdminProductRefilItem = ({
     const [quantity, setQuantity] = useState(product.quantity.toString())
     const [action, setAction] = useState("")
 
-    const updateRefil = useCallback(async () => {
+    const updateRefil = useCallback(async (clear: boolean) => {
         let qty = 0;
         if (quantity) {
             qty = parseInt(quantity) - product.quantity
@@ -62,7 +62,7 @@ const AdminProductRefilItem = ({
         } catch (error) {
             onSave(productCopy)
         }
-        focusSearch(true)
+        focusSearch(clear)
         setLoading(false)
     }, [quantity, product])
 
@@ -131,7 +131,7 @@ const AdminProductRefilItem = ({
     const actionButton = useMemo(() => {
         if (quantity && product.quantity !== parseInt(quantity)) {
             return (
-                <IconButton disabled={loading} size="small" onClick={updateRefil}>
+                <IconButton disabled={loading} size="small" onClick={() => updateRefil(false)}>
                     <UpgradeIcon />
                 </IconButton>
             )
@@ -187,7 +187,7 @@ const AdminProductRefilItem = ({
                             onChange={(event) => setQuantity(event.target.value)}
                             onKeyDown={(event) => {
                                 if(event.key == "Enter"){
-                                    updateRefil()
+                                    updateRefil(true)
                                 }
                             }}
                             size="small"

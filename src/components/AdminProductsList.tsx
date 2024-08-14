@@ -1,18 +1,20 @@
 "use client"
 import { FormControlLabel, IconButton, InputAdornment, Stack, Switch, TextField, Typography } from '@mui/material'
-import { Price, Product, Shop } from '@prisma/client'
+import { Barcode, Price, Product, Shop } from '@prisma/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import AdminProductItem from './AdminProductItem'
 import AdminProductForm from './AdminProductForm'
 import ClearIcon from '@mui/icons-material/Clear';
 
 export interface ProductWithPrice extends Product {
-    prices: Price[]
+    prices: Price[];
+    barcodes: { code: string; }[];
 }
 
 interface Props {
-    products: ProductWithPrice[],
+    products: ProductWithPrice[], 
     shop: Shop,
+    barcodesMap: Map<string, number>,
 }
 
 export const calculateMatchPercentage = (searchLower: string, text: string) => {
@@ -24,14 +26,23 @@ export const calculateMatchPercentage = (searchLower: string, text: string) => {
 
 function AdminProductsList({
     products,
-    shop
+    shop,
+    barcodesMap
 }: Props) {
     const [productList, setProductList] = useState<ProductWithPrice[]>(products);
     const [search, setSearch] = useState("")
     const [addNew, setAddNew] = useState(false)
     const [zeroPriceOnly, setZeroPriceOnly] = useState(false)
+    const [isBarcode, setIsBarCode] = useState(false)
 
     const filteredProducts = useMemo(() => {
+        if(barcodesMap.has(search.trim())){
+            const productId = barcodesMap.get(search.trim())
+            setIsBarCode(true);
+            return productList.filter(product => product.id === productId);
+        }
+
+        setIsBarCode(false);
         return productList.filter(product => {
             if (zeroPriceOnly) {
                 if (product.prices.length == 0) return true;
@@ -51,6 +62,9 @@ function AdminProductsList({
     }, [productList, search, zeroPriceOnly]);
 
     const handleSaveProduct = (savedProduct: ProductWithPrice, isNew?: boolean) => {
+        if(savedProduct.barcodes.length){
+            barcodesMap.set(savedProduct.barcodes[0].code, savedProduct.id)
+        }
         if (isNew) {
             setProductList(prev => [savedProduct, ...prev])
         } else {
@@ -71,7 +85,7 @@ function AdminProductsList({
                     <Switch size='medium' checked={addNew} onClick={() => setAddNew(prev => !prev)} />
                 </Stack>
                 {addNew && (
-                    <AdminProductForm addNew={addNew} shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} products={productList} />
+                    <AdminProductForm addNew={addNew} shopId={shop.id} onSave={(savedProduct) => handleSaveProduct(savedProduct, true)} products={productList} code={isBarcode ? search.trim() : ""} />
                 )}
             </Stack>
             <Stack>
@@ -123,7 +137,7 @@ function AdminProductsList({
                     </Stack>
                 </Stack>
                 {filteredProducts.map(product => (
-                    <AdminProductItem key={product.id} product={product} onSave={handleSaveProduct} />
+                    <AdminProductItem key={product.id} product={product} onSave={handleSaveProduct} code={isBarcode ? search.trim() : ""} />
                 ))}
             </Stack>
         </Stack>

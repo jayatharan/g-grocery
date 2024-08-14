@@ -1,22 +1,26 @@
-import { Autocomplete, Button, Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField } from '@mui/material'
+import { Autocomplete, Button, Checkbox, Collapse, FormControlLabel, IconButton, InputAdornment, Stack, TextField } from '@mui/material'
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { ProductWithPrice } from './AdminProductsList'
 import saveProduct from '@/actions/saveProduct';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 interface Props {
     shopId: number,
     product?: ProductWithPrice,
     onSave: (savedProduct: ProductWithPrice) => void;
     addNew?: boolean;
-    products?: ProductWithPrice[]
+    products?: ProductWithPrice[];
+    code?: string;
 }
 
 const defaultValue = {
     name: "",
     category: "Others",
     price: 0.00,
-    description: ""
+    description: "",
+    code: ""
 }
 
 const AdminProductForm = ({
@@ -24,11 +28,13 @@ const AdminProductForm = ({
     product,
     onSave,
     addNew,
-    products
+    products,
+    code
 }: Props) => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(defaultValue)
     const [reset, setReset] = useState(false);
+    const [more, setMore] = useState(false)
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
@@ -49,7 +55,7 @@ const AdminProductForm = ({
             productFormData.set("category", formData.category)
             productFormData.set("price", formData.price.toString())
             productFormData.set("description", formData.description)
-
+            productFormData.set("code", formData.code.trim())
             if (product) {
                 productFormData.set("id", product.id.toString())
             }
@@ -57,8 +63,12 @@ const AdminProductForm = ({
             const savedProduct = await saveProduct(productFormData)
 
             if (reset) setFormData(defaultValue)
-
+            else setFormData(prev => ({
+                ...prev,
+                code: ""
+            }))
             onSave(savedProduct)
+
         } catch (error) {
             console.log(error)
         }
@@ -71,7 +81,8 @@ const AdminProductForm = ({
                 name: product.name,
                 category: product.category,
                 description: product.description ?? "",
-                price: product.prices[0]?.price ?? 0
+                price: product.prices[0]?.price ?? 0,
+                code: code ?? ""
             })
         } else {
             setFormData(defaultValue)
@@ -102,20 +113,20 @@ const AdminProductForm = ({
                 direction={"row"}
             >
                 <Stack display={"flex"} flex={2} >
-                    {products?(
+                    {products ? (
                         <Autocomplete
                             size='small'
                             options={products.map(product => product.name)}
                             value={formData.name}
                             onChange={(_, name) => {
-                                if(name){
+                                if (name) {
                                     const product = products.find(p => p.name == name)
-                                    if(product){
+                                    if (product) {
                                         setFormData(prev => ({
                                             ...prev,
                                             name,
                                             category: product.category,
-                                            description: product.description??"",
+                                            description: product.description ?? "",
                                         }))
                                     }
                                 }
@@ -123,10 +134,10 @@ const AdminProductForm = ({
                             onInputChange={(_, name) => {
                                 setFormData(prev => ({
                                     ...prev,
-                                    name: name? name : prev.name
+                                    name: name ? name : prev.name
                                 }))
                             }}
-                            renderInput={(params) => <TextField 
+                            renderInput={(params) => <TextField
                                 {...params}
                                 placeholder='Name'
                                 InputProps={{
@@ -137,10 +148,10 @@ const AdminProductForm = ({
                                                 <ArrowBackIcon />
                                             </IconButton>
                                         </InputAdornment>
-                                    )                              
+                                    )
                                 }}
                                 fullWidth
-                            />} 
+                            />}
                             freeSolo
                             fullWidth
                         />
@@ -154,7 +165,7 @@ const AdminProductForm = ({
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position='end'>
-                                        <IconButton size='small' onClick={clearName}>
+                                        <IconButton size='small' onClick={clearName} >
                                             <ArrowBackIcon />
                                         </IconButton>
                                     </InputAdornment>
@@ -205,6 +216,25 @@ const AdminProductForm = ({
             {addNew && (
                 <FormControlLabel control={<Checkbox checked={reset} onClick={() => setReset(true)} />} label="Reset on Save" />
             )}
+            <Stack>
+                <Collapse in={more}>
+                    <Stack pt={2}>
+                        <TextField
+                            size='small'
+                            value={formData.code}
+                            placeholder='Barcode'
+                            onChange={handleChange}
+                            name="code"
+                            label={"Barcode"}
+                        />
+                    </Stack>
+                </Collapse>
+                <Stack display={'flex'} alignItems={'center'} p={1} onClick={() => setMore(prev => !prev)}>
+                    <IconButton size='small' sx={{ p: 0 }}>
+                        {more ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </Stack>
+            </Stack>
         </Stack>
     )
 }

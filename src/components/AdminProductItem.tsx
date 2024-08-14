@@ -7,11 +7,13 @@ import AdminProductItemView from './AdminProductItemView';
 interface Props {
     product: ProductWithPrice,
     onSave:  (savedProduct: ProductWithPrice) => void;
+    code?: string;
 }
 
 const AdminProductItem = ({
     product,
     onSave,
+    code,
 }: Props) => {
     const [edit, setEdit] = useState(false)
 
@@ -21,7 +23,7 @@ const AdminProductItem = ({
     }
 
     if(edit) {
-        return <AdminProductForm onSave={handleSave} shopId={product.shopId} product={product} />
+        return <AdminProductForm onSave={handleSave} shopId={product.shopId} product={product} code={code ? code : product.barcodes[0]?.code??""} />
     }
 
     return (

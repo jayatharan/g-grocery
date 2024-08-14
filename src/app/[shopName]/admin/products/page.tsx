@@ -2,6 +2,7 @@ import { Container, Stack, Typography } from "@mui/material";
 import prisma from "@/lib/prisma";
 import AdminProductsList from "@/components/AdminProductsList";
 import AdminHeader from "@/components/AdminHeader";
+import getFormatedBarcodes from "@/actions/getFormatedBarcodes";
 
 interface Props {
     params: {
@@ -30,7 +31,16 @@ export default async function AdminProductsScreen({
             prices: {
                 take: 1,
                 orderBy: {
-                    createdAt: "desc",
+                    id: "desc",
+                }
+            },
+            barcodes: {
+                take: 1,
+                orderBy: {
+                    id: "desc",
+                },
+                select: {
+                    code: true,
                 }
             }
         },
@@ -39,10 +49,12 @@ export default async function AdminProductsScreen({
         }
     })
 
+    const barcodesMap = await getFormatedBarcodes(shopName);
+
     return (
         <Container maxWidth={"md"}>
             <AdminHeader heading="Products" shopName={shopName} />
-            <AdminProductsList products={products} shop={shop} />
+            <AdminProductsList products={products} shop={shop} barcodesMap={barcodesMap} />
         </Container>
     )
 }

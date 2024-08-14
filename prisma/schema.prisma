@@ -82,9 +82,10 @@ model Product {
 
   shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
-  prices Price[]
-  refils Refil[]
-  buys   Buy[]
+  prices   Price[]
+  refils   Refil[]
+  buys     Buy[]
+  barcodes Barcode[]
 }
 
 model Refil {
@@ -96,8 +97,8 @@ model Refil {
   updatedAt DateTime @updatedAt()
 
   notAvailable Boolean @default(false)
-  done    Boolean @default(false)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  done         Boolean @default(false)
+  product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Buy {
@@ -118,7 +119,20 @@ model Price {
 
   price Float
 
+  barcodeId Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  product Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  barcode Barcode? @relation(fields: [barcodeId], references: [id], onDelete: SetNull)
+}
+
+model Barcode {
+  id        Int    @id @default(autoincrement())
+  productId Int
+  code      String @unique
+
+  prices  Price[]
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

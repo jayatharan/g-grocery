@@ -8,6 +8,7 @@ export default async function saveProduct(formData: FormData) {
     const category = formData.get("category")?.toString() ?? "Others"
     const productPrice = parseFloat(formData.get("price")?.toString() ?? "0")
     const description = formData.get("description")?.toString() ?? "";
+    const code = formData.get("code")?.toString() ?? "";
 
     const product = await prisma.product.upsert({
         where: {
@@ -27,17 +28,50 @@ export default async function saveProduct(formData: FormData) {
         }
     })
 
+    let barcodeId: number | null = null;
+    if(code) {
+        const barcode = await prisma.barcode.upsert({
+            where: {
+                code,
+            },
+            create: {
+                code,
+                productId: product.id,
+            },
+            update: {
+                productId: product.id,
+            }
+        })
+
+        barcodeId = barcode.id;
+    }
+
     const price = await prisma.price.create({
         data: {
             productId: product.id,
             price: productPrice,
+            barcodeId
         }
     })    
+
+    const barcodes = await prisma.barcode.findMany({
+        where: {
+            productId: product.id
+        },
+        take: 1,
+        orderBy: {
+            id: "desc"
+        },
+        select: {
+            code: true,
+        }
+    })
 
     return {
         ...product,
         prices: [
             price
-        ]
+        ],
+        barcodes
     }
 }

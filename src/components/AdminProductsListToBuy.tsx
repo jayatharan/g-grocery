@@ -2,7 +2,7 @@
 
 import { FormControlLabel, IconButton, InputAdornment, Stack, Switch, TextField, Typography } from "@mui/material"
 import { Buy, Product } from "@prisma/client"
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import AdminProductBuyItem from "./AdminProductBuyItem"
 import ClearIcon from '@mui/icons-material/Clear';
 import { calculateMatchPercentage } from "./AdminProductsList"
@@ -18,6 +18,7 @@ interface Props {
 const AdminProductsListToBuy = ({
     products
 }: Props) => {
+    const searchBoxRef = useRef<HTMLInputElement>(null)
     const [productList, setProductList] = useState<ProductWithBuy[]>(products);
     const [search, setSearch] = useState("")
     const [toBuyOnly, setToBuyOnly] = useState(false)
@@ -49,10 +50,18 @@ const AdminProductsListToBuy = ({
         }))
     }
 
+    const focusSearch = (clear: boolean) => {
+        if (clear) {
+            setSearch("")
+        }
+        searchBoxRef.current?.focus()
+    }
+
     return (
         <Stack spacing={2}>
             <Stack>
             <TextField
+                   inputRef={searchBoxRef}
                     size='small'
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
@@ -91,7 +100,7 @@ const AdminProductsListToBuy = ({
                         </Stack>
                     </Stack>
                     {filteredProducts.map(product => (
-                        <AdminProductBuyItem product={product} key={product.id} onSave={handleSave} />
+                        <AdminProductBuyItem product={product} key={product.id} onSave={handleSave} focusSearch={focusSearch} />
                     ))}
                 </Stack>
             </Stack>

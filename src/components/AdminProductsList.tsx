@@ -5,6 +5,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import AdminProductItem from './AdminProductItem'
 import AdminProductForm from './AdminProductForm'
 import ClearIcon from '@mui/icons-material/Clear';
+import { BarcodeScanner } from 'react-barcode-scanner'
+import "react-barcode-scanner/polyfill"
 
 export interface ProductWithPrice extends Product {
     prices: Price[];
@@ -79,6 +81,7 @@ function AdminProductsList({
 
     return (
         <Stack spacing={2}>
+            {/* <BarcodeScanner onCapture={(barcode) => console.log(barcode)}/> */}
             <Stack py={1}>
                 <Stack display={'flex'} direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
                     <Typography variant='h6' fontWeight={700}>Add New Product</Typography>
